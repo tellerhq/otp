@@ -179,6 +179,7 @@
 #if OPENSSL_VERSION_NUMBER >= PACKED_OPENSSL_VERSION_PLAIN(1,1,0)
 # ifndef HAS_LIBRESSL
 #  define HAVE_CHACHA20_POLY1305
+#  define HAVE_RSA_OAEP_MD
 # endif
 #endif
 
@@ -199,7 +200,6 @@
 */
 # define HAS_ENGINE_SUPPORT
 #endif
-
 
 #if defined(HAS_ENGINE_SUPPORT)
 # include <openssl/engine.h>
@@ -4876,7 +4876,7 @@ static ERL_NIF_TERM pkey_crypt_nif(ErlNifEnv *env, int argc, const ERL_NIF_TERM 
         } else {
             /* non-evp rsa private decrypt */
             i = RSA_private_decrypt(in_bin.size, in_bin.data,
-                                    out_bin.data, rsa, crypt_opt.rsa_padding);       
+                                    out_bin.data, rsa, crypt_opt.rsa_padding);
             if (i > 0) {
                 ERL_VALGRIND_MAKE_MEM_DEFINED(out_bin.data, i);
                 enif_realloc_binary(&out_bin, i);
@@ -4894,7 +4894,7 @@ static ERL_NIF_TERM pkey_crypt_nif(ErlNifEnv *env, int argc, const ERL_NIF_TERM 
         } else {
             /* non-evp rsa public decrypt */
             i = RSA_public_decrypt(in_bin.size, in_bin.data,
-                                   out_bin.data, rsa, crypt_opt.rsa_padding);    
+                                   out_bin.data, rsa, crypt_opt.rsa_padding);
             if (i > 0) {
                 ERL_VALGRIND_MAKE_MEM_DEFINED(out_bin.data, i);
                 enif_realloc_binary(&out_bin, i);
@@ -5012,7 +5012,7 @@ static ERL_NIF_TERM privkey_to_pubkey_nif(ErlNifEnv* env, int argc, const ERL_NI
           / * Example of result:
                {
                  Curve =  {Field, Prime, Point, Order, CoFactor} =
-                    { 
+                    {
                       Field =  {prime_field,<<255,...,255>>},
                       Prime = {<<255,...,252>>,
                                <<90,...,75>>,
@@ -5025,9 +5025,9 @@ static ERL_NIF_TERM privkey_to_pubkey_nif(ErlNifEnv* env, int argc, const ERL_NI
                 Key = <<151,...,62>>
                 }
               or
-              { 
+              {
                 Curve =
-                    {characteristic_two_field, 
+                    {characteristic_two_field,
                      M,
                      Basis = {tpbasis, _}
                            | {ppbasis, k1, k2, k3}
@@ -5040,7 +5040,7 @@ static ERL_NIF_TERM privkey_to_pubkey_nif(ErlNifEnv* env, int argc, const ERL_NI
         */
 #endif
     }
-    
+
     if (pkey) EVP_PKEY_free(pkey);
     return enif_make_badarg(env);
 }
@@ -5221,7 +5221,7 @@ static ERL_NIF_TERM engine_ctrl_cmd_strings_nif(ErlNifEnv* env, int argc, const 
 
  error:
     for(i = 0; cmds != NULL && cmds[i] != NULL; i++)
-        enif_free(cmds[i]);    
+        enif_free(cmds[i]);
     enif_free(cmds);
     return ret;
 #else
